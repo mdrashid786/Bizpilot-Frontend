@@ -43,6 +43,8 @@ export async function registerUser(payload: RegisterPayload): Promise<AuthRespon
     throw new Error(data.message || "Registration failed");
   }
 
+  localStorage.setItem("user", JSON.stringify(data.user));
+
   return data as AuthResponse;
 }
 
@@ -65,6 +67,8 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
   if (!response.ok) {
     throw new Error(data.message || "Login failed");
   }
+
+    localStorage.setItem("user", JSON.stringify(data.user));
 
   return data as AuthResponse;
 }
@@ -89,6 +93,8 @@ export async function logoutUser(): Promise<void> {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("keep_logged_in");
+    localStorage.removeItem("user"); 
+
   }
   
 }
