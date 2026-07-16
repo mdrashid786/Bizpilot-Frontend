@@ -18,6 +18,9 @@ import {
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
 
+import { getCategoryConfig } from "../services/categoryDataService"; // apna actual path check kar lena
+
+
 type NavItem = {
   name: string;
   icon: React.ReactNode;
@@ -25,50 +28,6 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-const navItems: NavItem[] = [
-  {
-    icon: <GridIcon />,
-    name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/profile",
-  },
-{
-  name: "Forms",
-  icon: <ListIcon />,
-  subItems: [
-    { name: "Form Elements", path: "/form-elements", pro: false }
-  ]
-},
-{
-  name: "Business",
-  icon: <ListIcon />,
-  subItems: [
-    { name: "Add Your Business", path: "/add-your-business", pro: false }
-  ]
-},
-  {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
-    ],
-  },
-];
 
 const othersItems: NavItem[] = [
   {
@@ -95,7 +54,7 @@ const othersItems: NavItem[] = [
     icon: <PlugInIcon />,
     name: "Authentication",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
+      { name: "Sign In", path: "/", pro: false },
       { name: "Sign Up", path: "/signup", pro: false },
     ],
   },
@@ -104,6 +63,67 @@ const othersItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
+
+  const [menuLabel, setMenuLabel] = useState("Manage Items");
+
+  useEffect(() => {
+    async function loadLabel() {
+      try {
+        const config = await getCategoryConfig();
+        setMenuLabel(config.dashboardSectionLabel);
+      } catch {
+        // fallback rehne do
+      }
+    }
+    loadLabel();
+  }, []);
+
+
+  const navItems: NavItem[] = [
+    {
+      icon: <GridIcon />,
+      name: "Dashboard",
+      subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    },
+    {
+      icon: <CalenderIcon />,
+      name: "Calendar",
+      path: "/calendar",
+    },
+    {
+      icon: <UserCircleIcon />,
+      name: "User Profile",
+      path: "/profile",
+    },
+    {
+      name: "Forms",
+      icon: <ListIcon />,
+      subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    },
+    {
+      name: "Business",
+      icon: <ListIcon />,
+      subItems: [
+        { name: "Add Your Business", path: "/add-your-business", pro: false },
+        { name: menuLabel, path: "/manage-menu", pro: false },
+        { name: "Publish Website", path: "/publish-website", pro: false }
+
+      ],
+    },
+    {
+      name: "Tables",
+      icon: <TableIcon />,
+      subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    },
+    {
+      name: "Pages",
+      icon: <PageIcon />,
+      subItems: [
+        { name: "Blank Page", path: "/blank", pro: false },
+        { name: "404 Error", path: "/error-404", pro: false },
+      ],
+    },
+  ];
 
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "others";

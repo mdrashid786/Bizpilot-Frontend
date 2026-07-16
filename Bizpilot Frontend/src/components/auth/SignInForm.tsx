@@ -48,7 +48,7 @@ export default function SignInForm() {
         localStorage.setItem("keep_logged_in", "true");
       }
 
-      navigate("/"); // dashboard pe redirect
+      navigate("/dashboard"); // dashboard pe redirect
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid email or password");
     } finally {

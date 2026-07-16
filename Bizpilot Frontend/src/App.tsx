@@ -19,6 +19,9 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import CategoryData from "./pages/Business/CategoryData"; // apna actual import path check kar lena
+import PublishWebsite from "./pages/Business/PublishWebsite"; // apna actual path check kar lena
+
 
 export default function App() {
   return (
@@ -28,7 +31,7 @@ export default function App() {
         <Routes>
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+            <Route index path="/dashboard" element={<Home />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
@@ -38,6 +41,10 @@ export default function App() {
             {/* Forms */}
             <Route path="/form-elements" element={<FormElements />} />
             <Route path="/add-your-business" element={<AddYourBusiness />} />
+            <Route path="/manage-menu" element={<CategoryData />} />
+            <Route path="/publish-website" element={<PublishWebsite />} />
+
+
 
             {/* Tables */}
             <Route path="/basic-tables" element={<BasicTables />} />
@@ -56,7 +63,7 @@ export default function App() {
           </Route>
 
           {/* Auth Layout */}
-          <Route path="/signin" element={<SignIn />} />
+          <Route path="/" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
 
           {/* Fallback Route */}
