@@ -1,4 +1,6 @@
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "./apiClient";
+
 
 export type BusinessCategory = "RESTAURANT" | "SALON" | "GYM" | "CLINIC";
 
@@ -78,11 +80,21 @@ export async function registerBusiness(
   return data as BusinessResponse;
 }
 
+// export async function getMyBusiness(): Promise<BusinessResponse | null> {
+//   const response = await fetch(`${API_BASE_URL}/business/my`, {
+//     method: "GET",
+//     headers: authHeaders(),
+//   });
+//   if (response.status === 204) return null;
+//   const data = await response.json();
+//   if (!response.ok) throw new Error(data.message || "Failed to fetch business");
+//   return data as BusinessResponse;
+// }
+
+
 export async function getMyBusiness(): Promise<BusinessResponse | null> {
-  const response = await fetch(`${API_BASE_URL}/business/my`, {
-    method: "GET",
-    headers: authHeaders(),
-  });
+  const response = await apiFetch(`${API_BASE_URL}/business/my`, { 
+    method: "GET" });
   if (response.status === 204) return null;
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to fetch business");
@@ -128,5 +140,31 @@ export async function uploadCoverImage(id: number, file: File): Promise<Business
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to upload cover image");
+  return data as BusinessResponse;
+}
+
+export interface ThemeOption {
+  key: string;
+  name: string;
+  description: string;
+}
+
+export async function getAvailableThemes(): Promise<ThemeOption[]> {
+  const response = await fetch(`${API_BASE_URL}/business/themes`, {
+    headers: authHeaders(),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to load themes");
+  return data as ThemeOption[];
+}
+
+export async function selectTheme(id: number, theme: string): Promise<BusinessResponse> {
+  const response = await fetch(`${API_BASE_URL}/business/${id}/theme`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify({ theme }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to select theme");
   return data as BusinessResponse;
 }

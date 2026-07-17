@@ -4,6 +4,8 @@ export interface CategoryField {
   key: string;
   label: string;
   type: string;
+  options?: string[]; // sirf select type ke liye
+
 }
 
 export interface CategoryConfigResponse {

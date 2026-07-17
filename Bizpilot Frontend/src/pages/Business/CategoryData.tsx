@@ -163,71 +163,90 @@ const handleImageSelect = async (key: string, e: ChangeEvent<HTMLInputElement>) 
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {config.fields.map((field) => (
-                <div key={field.key}>
-                <Label htmlFor={field.key}>{field.label}</Label>
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {[...config.fields]
+      .sort((a, b) => {
+        if (a.type === "image" && b.type !== "image") return 1;
+        if (a.type !== "image" && b.type === "image") return -1;
+        return 0;
+      })
+      .map((field) => (
+        <div key={field.key}>
+          <Label htmlFor={field.key}>{field.label}</Label>
 
-                {field.type === "image" ? (
-                    <div>
-                    {formValues[field.key] && (
-                        <img
-                        src={FILE_BASE_URL + formValues[field.key]}
-                        alt={field.label}
-                        className="w-20 h-20 object-cover rounded-lg mb-2 border border-gray-200 dark:border-gray-700"
-                        />
-                    )}
-                    <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        onChange={(e) => handleImageSelect(field.key, e)}
-                        className="block w-full text-xs text-gray-600 dark:text-gray-300
-                        file:mr-3 file:py-2 file:px-3
-                        file:rounded-lg file:border-0
-                        file:text-xs file:font-medium
-                        file:bg-brand-50 file:text-brand-600
-                        hover:file:bg-brand-100
-                        dark:file:bg-gray-800 dark:file:text-gray-300"
-                    />
-                    {uploadingImage === field.key && (
-                        <p className="mt-1 text-xs text-gray-500">Uploading...</p>
-                    )}
-                    </div>
-                ) : (
-                    <Input
-                    type={field.type === "number" ? "number" : "text"}
-                    id={field.key}
-                    placeholder={`Enter ${field.label.toLowerCase()}`}
-                    value={formValues[field.key] ?? ""}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        handleFieldChange(field.key, e.target.value)
-                    }
-                    />
-                )}
-                </div>
-            ))}
+          {field.type === "image" ? (
+            <div>
+              {formValues[field.key] && (
+                <img
+                  src={FILE_BASE_URL + formValues[field.key]}
+                  alt={field.label}
+                  className="w-20 h-20 object-cover rounded-lg mb-2 border border-gray-200 dark:border-gray-700"
+                />
+              )}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => handleImageSelect(field.key, e)}
+                className="block w-full text-xs text-gray-600 dark:text-gray-300
+                  file:mr-3 file:py-2 file:px-3
+                  file:rounded-lg file:border-0
+                  file:text-xs file:font-medium
+                  file:bg-brand-50 file:text-brand-600
+                  hover:file:bg-brand-100
+                  dark:file:bg-gray-800 dark:file:text-gray-300"
+              />
+              {uploadingImage === field.key && (
+                <p className="mt-1 text-xs text-gray-500">Uploading...</p>
+              )}
             </div>
-
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-6 py-2.5 rounded-lg bg-brand-500 text-white text-sm font-medium hover:bg-brand-600 transition disabled:opacity-60"
+          ) : field.type === "select" ? (
+            <select
+              value={formValues[field.key] ?? ""}
+              onChange={(e) => handleFieldChange(field.key, e.target.value)}
+              className="h-11 w-full rounded-lg border px-4 text-sm bg-transparent border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
             >
-              {saving ? "Saving..." : editingRowId ? "Update" : "Add"}
-            </button>
+              <option value="">Select {field.label}</option>
+              {field.options?.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <Input
+              type={field.type === "number" ? "number" : "text"}
+              id={field.key}
+              placeholder={`Enter ${field.label.toLowerCase()}`}
+              value={formValues[field.key] ?? ""}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                handleFieldChange(field.key, e.target.value)
+              }
+            />
+          )}
+        </div>
+      ))}
+  </div>
 
-            {editingRowId && (
-              <button
-                type="button"
-                onClick={() => resetForm(config)}
-                className="px-6 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
+  <div className="flex gap-3">
+    <button
+      type="submit"
+      disabled={saving}
+      className="px-6 py-2.5 rounded-lg bg-brand-500 text-white text-sm font-medium hover:bg-brand-600 transition disabled:opacity-60"
+    >
+      {saving ? "Saving..." : editingRowId ? "Update" : "Add"}
+    </button>
+
+    {editingRowId && (
+      <button
+        type="button"
+        onClick={() => resetForm(config)}
+        className="px-6 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+      >
+        Cancel
+      </button>
+    )}
+  </div>
+</form>
       </ComponentCard>
 
       <div className="mt-6">
@@ -252,20 +271,27 @@ const handleImageSelect = async (key: string, e: ChangeEvent<HTMLInputElement>) 
                     <tr key={row.rowId} className="border-b border-gray-100 dark:border-gray-800">
                       {config.fields.map((f) => (
                         <td key={f.key} className="py-2 px-3 text-gray-700 dark:text-gray-300">
-
-                           {f.type === "image" && row.fields[f.key] ? (
-                            <img
-                                src={FILE_BASE_URL + row.fields[f.key]}
-                                alt={f.label}
-                                className="w-10 h-10 object-cover rounded-md border border-gray-200 dark:border-gray-700"
-                            />
-                            ) : (
+                          {f.type === "image" && row.fields[f.key] ? (
+                            <img src={FILE_BASE_URL + row.fields[f.key]} alt={f.label} className="w-10 h-10 object-cover rounded-md border border-gray-200 dark:border-gray-700" />
+                          ) : f.type === "select" ? (
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                row.fields[f.key] === "Veg"
+                                  ? "bg-success-50 text-success-600"
+                                  : row.fields[f.key] === "Non-Veg"
+                                  ? "bg-error-50 text-error-600"
+                                  : "bg-gray-100 text-gray-600"
+                              }`}
+                            >
+                              {row.fields[f.key]}
+                            </span>
+                          ) : (
                             row.fields[f.key]
-                            )}
-                            
+                          )}
                         </td>
-                      )
-                      )}
+                      ))}
+                    
+                     
                       <td className="py-2 px-3 text-right whitespace-nowrap">
                         <button
                           onClick={() => handleEdit(row)}

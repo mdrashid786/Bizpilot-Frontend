@@ -88,6 +88,7 @@ const navItems: NavItem[] = [
       subItems: [
         { name: "Add Your Business", path: "/add-your-business", pro: false },
         { name: menuLabel, path: "/manage-menu", pro: false },
+        { name: "Choose Template", path: "/choose-template", pro: false },  
         { name: "Publish Website", path: "/publish-website", pro: false }
 
       ],

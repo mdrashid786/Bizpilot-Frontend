@@ -1,5 +1,4 @@
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
-import UserMetaCard from "../components/UserProfile/UserMetaCard";
 import PageMeta from "../components/common/PageMeta";
 import  EditProfileForm  from "../components/UserProfile/EditProfileForm";
 

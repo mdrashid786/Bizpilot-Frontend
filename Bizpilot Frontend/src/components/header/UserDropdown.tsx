@@ -3,6 +3,8 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useNavigate } from "react-router";
 import { logoutUser } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
+
 
 interface CurrentUser {
   id: number;
@@ -16,6 +18,9 @@ export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<CurrentUser | null>(null);
   const navigate = useNavigate();
+
+  const { logout } = useAuth();
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -32,11 +37,22 @@ export default function UserDropdown() {
     setIsOpen(false);
   }
 
+  // async function handleLogout(e: React.MouseEvent<HTMLAnchorElement>) {
+  //   e.preventDefault();
+  //   closeDropdown();
+  //   await logoutUser();
+  //   navigate("/");
+  // }
+
   async function handleLogout(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
     closeDropdown();
-    await logoutUser();
-    navigate("/");
+
+    await logoutUser();  
+    logout();           
+  //navigate("/", { replace: true });
+    window.location.href = "/"; // full page reload — state guaranteed fresh hoga
+
   }
 
   return (

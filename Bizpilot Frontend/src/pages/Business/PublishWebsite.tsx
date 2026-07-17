@@ -3,6 +3,12 @@ import { useState, useEffect } from "react";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
 import ComponentCard from "../../components/common/ComponentCard";
+import { Link } from "react-router";
+
+import { API_BASE_URL } from "../../config/api";
+
+const FILE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+
 
 import { getMyBusiness, toggleBusinessPublish, BusinessResponse } from "../../services/businessService";
 
@@ -41,7 +47,7 @@ export default function PublishWebsite() {
     }
   };
 
-  const siteUrl = business ? `${window.location.origin}/${business.slug}` : "";
+  const siteUrl = business ? `${FILE_BASE_URL}/${business.slug}` : "";
 
   if (loading) {
     return (
@@ -74,8 +80,14 @@ export default function PublishWebsite() {
         {error && (
           <div className="mb-4 text-xs sm:text-sm text-error-500 bg-error-50 dark:bg-error-500/10 px-3 sm:px-4 py-2 rounded-lg break-words">
             {error}
+            {error.includes("template") && (
+              <Link to="/choose-template" className="ml-2 underline font-medium">
+                Choose a template →
+              </Link>
+            )}
           </div>
         )}
+        
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 dark:bg-gray-800">
           <div className="flex items-center gap-3">

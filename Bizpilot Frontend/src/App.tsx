@@ -15,12 +15,16 @@ import Calendar from "./pages/Calendar";
 import BasicTables from "./pages/Tables/BasicTables";
 import FormElements from "./pages/Forms/FormElements";
 import AddYourBusiness from "./pages/Forms/AddYourBusiness";
-import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import CategoryData from "./pages/Business/CategoryData"; // apna actual import path check kar lena
 import PublishWebsite from "./pages/Business/PublishWebsite"; // apna actual path check kar lena
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
+import ChooseTemplate from "./pages/Business/ChooseTemplate";
+
 
 
 export default function App() {
@@ -28,47 +32,59 @@ export default function App() {
     <>
       <Router>
         <ScrollToTop />
-        <Routes>
-          {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route index path="/dashboard" element={<Home />} />
+        <AuthProvider>
+          <Routes>
+            {/* Dashboard Layout */}
+            <Route element={<AppLayout />}>
+              <Route path="/dashboard" element={
+                <ProtectedRoute><Home /></ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute><UserProfiles /></ProtectedRoute>
+              } />
+              <Route path="/calendar" element={
+                <ProtectedRoute><Calendar /></ProtectedRoute>
+              } />
+              <Route path="/form-elements" element={
+                <ProtectedRoute><FormElements /></ProtectedRoute>
+              } />
+              <Route path="/add-your-business" element={
+                <ProtectedRoute><AddYourBusiness /></ProtectedRoute>
+              } />
+              <Route path="/manage-menu" element={
+                <ProtectedRoute><CategoryData /></ProtectedRoute>
+              } />
+              <Route path="/choose-template" element={
+                <ProtectedRoute><ChooseTemplate /></ProtectedRoute>
+              } />
+              <Route path="/publish-website" element={
+                <ProtectedRoute><PublishWebsite /></ProtectedRoute>
+              } />
 
-            {/* Others Page */}
-            <Route path="/profile" element={<UserProfiles />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/blank" element={<Blank />} />
+              {/* Tables, UI Elements, Charts — waise hi rahenge jo public hain */}
+              <Route path="/basic-tables" element={<BasicTables />} />
+              <Route path="/alerts" element={<Alerts />} />
+              <Route path="/avatars" element={<Avatars />} />
+              <Route path="/badge" element={<Badges />} />
+              <Route path="/buttons" element={<Buttons />} />
+              <Route path="/images" element={<Images />} />
+              <Route path="/videos" element={<Videos />} />
+              <Route path="/line-chart" element={<LineChart />} />
+              <Route path="/bar-chart" element={<BarChart />} />
+            </Route>
 
-            {/* Forms */}
-            <Route path="/form-elements" element={<FormElements />} />
-            <Route path="/add-your-business" element={<AddYourBusiness />} />
-            <Route path="/manage-menu" element={<CategoryData />} />
-            <Route path="/publish-website" element={<PublishWebsite />} />
+            {/* Auth Layout — ab PublicRoute se guarded */}
+            <Route path="/" element={
+              <PublicRoute><SignIn /></PublicRoute>
+            } />
+            <Route path="/signup" element={
+              <PublicRoute><SignUp /></PublicRoute>
+            } />
 
-
-
-            {/* Tables */}
-            <Route path="/basic-tables" element={<BasicTables />} />
-
-            {/* Ui Elements */}
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/avatars" element={<Avatars />} />
-            <Route path="/badge" element={<Badges />} />
-            <Route path="/buttons" element={<Buttons />} />
-            <Route path="/images" element={<Images />} />
-            <Route path="/videos" element={<Videos />} />
-
-            {/* Charts */}
-            <Route path="/line-chart" element={<LineChart />} />
-            <Route path="/bar-chart" element={<BarChart />} />
-          </Route>
-
-          {/* Auth Layout */}
-          <Route path="/" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-
-          {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/* Fallback Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </Router>
     </>
   );

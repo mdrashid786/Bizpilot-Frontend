@@ -6,6 +6,7 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { loginUser } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 
 interface LoginFormData {
   email: string;
@@ -14,6 +15,8 @@ interface LoginFormData {
 
 export default function SignInForm() {
   const navigate = useNavigate();
+    const { login } = useAuth();   // ✅ YAHAN — component ke top-level pe
+
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -40,7 +43,8 @@ export default function SignInForm() {
         email: formData.email,
         password: formData.password,
       });
-
+      login(response.accessToken, response.refreshToken, response.user);  // Context update
+      
       localStorage.setItem("access_token", response.accessToken);
       localStorage.setItem("refresh_token", response.refreshToken);
 
@@ -55,6 +59,34 @@ export default function SignInForm() {
       setLoading(false);
     }
   };
+
+//   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+//   e.preventDefault();
+//   setError("");
+//   setLoading(true);
+
+//     const { login } = useAuth();   // 👈 ab ye kaam karega
+
+
+//   try {
+//     const response = await loginUser({
+//       email: formData.email,
+//       password: formData.password,
+//     });
+
+//     login(response.accessToken, response.refreshToken, response.user);  // Context update
+
+//     if (isChecked) {
+//       localStorage.setItem("keep_logged_in", "true");
+//     }
+
+//     navigate("/dashboard");
+//   } catch (err) {
+//     setError(err instanceof Error ? err.message : "Invalid email or password");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 
   return (
     <div className="flex flex-col flex-1">
