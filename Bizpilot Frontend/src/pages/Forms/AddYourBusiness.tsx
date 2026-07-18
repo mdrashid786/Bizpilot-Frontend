@@ -252,6 +252,7 @@ export default function AddYourBusiness() {
           address: formData.address,
           description: formData.description,
           category: formData.category,   // ab yahan error nahi aayega
+          googleMap: formData.googleMap,
         });
         currentId = created.id;
         setBusinessId(created.id);

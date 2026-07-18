@@ -19,7 +19,7 @@ async function refreshAccessToken(): Promise<string | null> {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
-      window.location.href = "/signin";
+      window.location.href = "/";
       return null;
     }
 
@@ -47,7 +47,6 @@ export async function apiFetch(url: string, options: RequestInit = {}): Promise<
   let response = await doFetch(accessToken);
 
   if (response.status === 401) {
-    // Access token expire ho chuka — silently refresh karo
     if (!isRefreshing) {
       isRefreshing = true;
       refreshPromise = refreshAccessToken().finally(() => {
@@ -58,9 +57,42 @@ export async function apiFetch(url: string, options: RequestInit = {}): Promise<
     const newToken = await refreshPromise;
 
     if (newToken) {
-      response = await doFetch(newToken); // original request retry karo naye token se
+      response = await doFetch(newToken);
     }
   }
 
   return response;
 }
+
+// export async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
+//   const accessToken = localStorage.getItem("access_token");
+
+//   const doFetch = (token: string | null) =>
+//     fetch(url, {
+//       ...options,
+//       headers: {
+//         ...options.headers,
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//   let response = await doFetch(accessToken);
+
+//   if (response.status === 401) {
+//     // Access token expire ho chuka — silently refresh karo
+//     if (!isRefreshing) {
+//       isRefreshing = true;
+//       refreshPromise = refreshAccessToken().finally(() => {
+//         isRefreshing = false;
+//       });
+//     }
+
+//     const newToken = await refreshPromise;
+
+//     if (newToken) {
+//       response = await doFetch(newToken); // original request retry karo naye token se
+//     }
+//   }
+
+//   return response;
+// }
