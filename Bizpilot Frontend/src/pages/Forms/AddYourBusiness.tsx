@@ -20,6 +20,18 @@ import {
 import { API_BASE_URL } from "../../config/api";
 import { useNavigate } from "react-router";
 
+
+// interface BusinessFormData {
+//   businessName: string;
+//   phone: string;
+//   description: string;
+//   category: BusinessCategory | "";
+//   email: string;
+//   whatsapp: string;
+//   address: string;
+//   googleMap: string;
+// }
+
 interface BusinessFormData {
   businessName: string;
   phone: string;
@@ -29,6 +41,10 @@ interface BusinessFormData {
   whatsapp: string;
   address: string;
   googleMap: string;
+  tagline: string;
+  businessHours: string;
+  instagramUrl: string;
+  facebookUrl: string;
 }
 
 interface FieldErrors {
@@ -57,16 +73,19 @@ export default function AddYourBusiness() {
   const [businessId, setBusinessId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState<BusinessFormData>({
-    businessName: "",
-    phone: "",
-    description: "",
-    category: "",
-    email: "",
-    whatsapp: "",
-    address: "",
-    googleMap: "",
-  });
-
+  businessName: "",
+  phone: "",
+  description: "",
+  category: "",
+  email: "",
+  whatsapp: "",
+  address: "",
+  googleMap: "",
+  tagline: "",
+  businessHours: "",
+  instagramUrl: "",
+  facebookUrl: "",
+});
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -90,15 +109,19 @@ export default function AddYourBusiness() {
         if (business) {
           setBusinessId(business.id);
           setFormData({
-            businessName: business.businessName,
-            phone: business.phone,
-            description: business.description ?? "",
-            category: business.category,
-            email: business.email ?? "",
-            whatsapp: business.whatsapp ?? "",
-            address: business.address ?? "",
-            googleMap: business.googleMap ?? "",
-          });
+              businessName: business.businessName,
+              phone: business.phone,
+              description: business.description ?? "",
+              category: business.category,
+              email: business.email ?? "",
+              whatsapp: business.whatsapp ?? "",
+              address: business.address ?? "",
+              googleMap: business.googleMap ?? "",
+              tagline: business.tagline ?? "",
+              businessHours: business.businessHours ?? "",
+              instagramUrl: business.instagramUrl ?? "",
+              facebookUrl: business.facebookUrl ?? "",
+            });
           if (business.logo) setLogoPreview(FILE_BASE_URL + business.logo);
           if (business.coverImage) setCoverPreview(FILE_BASE_URL + business.coverImage);
         }
@@ -230,19 +253,25 @@ export default function AddYourBusiness() {
       let currentId = businessId;
 
       if (isEditMode && currentId !== null) {
-        await updateBusiness(currentId, {
-          businessName: formData.businessName,
-          phone: formData.phone,
-          email: formData.email,
-          whatsapp: formData.whatsapp,
-          address: formData.address,
-          description: formData.description,
-          googleMap: formData.googleMap,
-        });
-      } else {
-        if (!formData.category) {
-          return; // TS ko yahan pata chal jata hai ki category empty nahi hai iske aage
-        }
+          await updateBusiness(currentId, {
+            businessName: formData.businessName,
+            phone: formData.phone,
+            email: formData.email,
+            whatsapp: formData.whatsapp,
+            address: formData.address,
+            description: formData.description,
+            googleMap: formData.googleMap,
+            tagline: formData.tagline,
+            businessHours: formData.businessHours,
+            instagramUrl: formData.instagramUrl,
+            facebookUrl: formData.facebookUrl,
+          });
+        } else {
+          if (!formData.category) {
+            setError("Please select a business category.");
+            setLoading(false);
+            return;
+          }
 
         const created = await registerBusiness({
           businessName: formData.businessName,
@@ -251,12 +280,16 @@ export default function AddYourBusiness() {
           whatsapp: formData.whatsapp,
           address: formData.address,
           description: formData.description,
-          category: formData.category,   // ab yahan error nahi aayega
-          googleMap: formData.googleMap,
+          category: formData.category,
+          googleMap: formData.googleMap,        // 👈 add karo (pehle sirf update mein tha)
+          tagline: formData.tagline,
+          businessHours: formData.businessHours,
+          instagramUrl: formData.instagramUrl,
+          facebookUrl: formData.facebookUrl,
         });
-        currentId = created.id;
-        setBusinessId(created.id);
-      }
+          currentId = created.id;
+          setBusinessId(created.id);
+        }
 
       if (currentId !== null) {
         if (logoFile) await uploadLogo(currentId, logoFile);
@@ -361,6 +394,19 @@ export default function AddYourBusiness() {
                 <strong>Copy link</strong> par click karo → yahan paste kar do.
               </p>
             </div>
+            <div>
+              <Label htmlFor="tagline">Tagline (Short Catchy Line)</Label>
+              <Input
+                type="text"
+                id="tagline"
+                placeholder="e.g. Delhi's Most Loved Biryani Since 2015"
+                value={formData.tagline}
+                onChange={handleChange}
+              />
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                This appears as a highlight on your website's homepage.
+              </p>
+            </div>
           </div>
 
           {/* RIGHT SIDE */}
@@ -439,6 +485,42 @@ export default function AddYourBusiness() {
                 onChange={handleChange}
                 error={!!fieldErrors.address}
                 hint={fieldErrors.address}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="businessHours">Business Hours</Label>
+              <Input
+                type="text"
+                id="businessHours"
+                placeholder="e.g. Mon–Sat: 10AM–9PM, Sun: Closed"
+                value={formData.businessHours}
+                onChange={handleChange}
+              />
+               <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                e.g. Mon–Sat: 10AM–9PM, Sun: Closed
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="instagramUrl">Instagram Link</Label>
+              <Input
+                type="text"
+                id="instagramUrl"
+                placeholder="https://instagram.com/yourbusiness"
+                value={formData.instagramUrl}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="facebookUrl">Facebook Link</Label>
+              <Input
+                type="text"
+                id="facebookUrl"
+                placeholder="https://facebook.com/yourbusiness"
+                value={formData.facebookUrl}
+                onChange={handleChange}
               />
             </div>
           </div>

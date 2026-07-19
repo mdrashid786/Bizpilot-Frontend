@@ -15,4 +15,10 @@ export default defineConfig({
       },
     }),
   ],
+
+  server: {
+    allowedHosts: [
+      "halloween-jobs-disciplines-photos.trycloudflare.com",
+    ],
+  },
 });
