@@ -12,6 +12,10 @@ export interface BusinessRegistrationPayload {
   description?: string;
   category: BusinessCategory;
   googleMap?: string;
+  tagline?: string;
+  businessHours?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
 }
 
 export interface BusinessUpdatePayload {
@@ -22,6 +26,10 @@ export interface BusinessUpdatePayload {
   address?: string;
   description?: string;
   googleMap?: string;
+  tagline?: string;
+  businessHours?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
 }
 
 export interface BusinessResponse {
@@ -39,6 +47,10 @@ export interface BusinessResponse {
   category: BusinessCategory;
   theme: string;
   published: boolean;
+  tagline: string;
+  businessHours: string;
+  instagramUrl: string;
+  facebookUrl: string;
 }
 
 export interface ThemeOption {

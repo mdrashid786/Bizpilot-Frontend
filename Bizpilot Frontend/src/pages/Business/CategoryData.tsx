@@ -18,6 +18,8 @@ import {
   deleteCategoryRow,
   CategoryConfigResponse,
   CategoryRowResponse,
+  toggleRowActive,
+  toggleRowFeatured,
 } from "../../services/categoryDataService";
 
 export default function CategoryData() {
@@ -29,6 +31,9 @@ export default function CategoryData() {
   const [pageLoading, setPageLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const [formActive, setFormActive] = useState(true);
+  const [formFeatured, setFormFeatured] = useState(false);
 
   const FILE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
   const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1 MB
@@ -60,6 +65,10 @@ export default function CategoryData() {
     cfg.fields.forEach((f) => (empty[f.key] = ""));
     setFormValues(empty);
     setEditingRowId(null);
+    setFormActive(true); // 👈 add karo
+    setFormFeatured(false); // 👈 add karo
+
+
   }
 
   const handleFieldChange = (key: string, value: string) => {
@@ -102,11 +111,11 @@ const handleImageSelect = async (key: string, e: ChangeEvent<HTMLInputElement>) 
 
     setSaving(true);
     try {
-      if (editingRowId) {
-        const updated = await updateCategoryRow(editingRowId, formValues);
+     if (editingRowId) {
+        const updated = await updateCategoryRow(editingRowId, formValues, formActive, formFeatured);
         setRows((prev) => prev.map((r) => (r.rowId === editingRowId ? updated : r)));
       } else {
-        const created = await saveCategoryRow(formValues);
+        const created = await saveCategoryRow(formValues, formActive, formFeatured);
         setRows((prev) => [...prev, created]);
       }
       resetForm(config);
@@ -117,9 +126,30 @@ const handleImageSelect = async (key: string, e: ChangeEvent<HTMLInputElement>) 
     }
   };
 
+  const handleToggleActive = async (rowId: string) => {
+  try {
+    const updated = await toggleRowActive(rowId);
+    setRows((prev) => prev.map((r) => (r.rowId === rowId ? updated : r)));
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Failed to toggle status");
+  }
+};
+
+const handleToggleFeatured = async (rowId: string) => {
+  try {
+    const updated = await toggleRowFeatured(rowId);
+    setRows((prev) => prev.map((r) => (r.rowId === rowId ? updated : r)));
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Failed to toggle featured status");
+  }
+};
+
   const handleEdit = (row: CategoryRowResponse) => {
     setFormValues(row.fields);
     setEditingRowId(row.rowId);
+    setFormActive(row.active); // 👈 add karo
+    setFormFeatured(row.featured); // 👈 add karo
+
   };
 
   const handleDelete = async (rowId: string) => {
@@ -224,7 +254,29 @@ const handleImageSelect = async (key: string, e: ChangeEvent<HTMLInputElement>) 
             />
           )}
         </div>
+        
       ))}
+      <div className="flex items-center gap-6 mb-4">
+          <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={formActive}
+              onChange={(e) => setFormActive(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300"
+            />
+            Available (visible on website)
+          </label>
+
+          <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={formFeatured}
+              onChange={(e) => setFormFeatured(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300"
+            />
+            ⭐ Mark as Featured / Special
+          </label>
+        </div>
   </div>
 
   <div className="flex gap-3">
@@ -250,70 +302,101 @@ const handleImageSelect = async (key: string, e: ChangeEvent<HTMLInputElement>) 
       </ComponentCard>
 
       <div className="mt-6">
-        <ComponentCard title={config.dashboardSectionLabel}>
-          {rows.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">No items added yet.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-800 text-left">
-                    {config.fields.map((f) => (
-                      <th key={f.key} className="py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
-                        {f.label}
-                      </th>
-                    ))}
-                    <th className="py-2 px-3"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.rowId} className="border-b border-gray-100 dark:border-gray-800">
-                      {config.fields.map((f) => (
-                        <td key={f.key} className="py-2 px-3 text-gray-700 dark:text-gray-300">
-                          {f.type === "image" && row.fields[f.key] ? (
-                            <img src={FILE_BASE_URL + row.fields[f.key]} alt={f.label} className="w-10 h-10 object-cover rounded-md border border-gray-200 dark:border-gray-700" />
-                          ) : f.type === "select" ? (
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                row.fields[f.key] === "Veg"
-                                  ? "bg-success-50 text-success-600"
-                                  : row.fields[f.key] === "Non-Veg"
-                                  ? "bg-error-50 text-error-600"
-                                  : "bg-gray-100 text-gray-600"
-                              }`}
-                            >
-                              {row.fields[f.key]}
-                            </span>
-                          ) : (
-                            row.fields[f.key]
-                          )}
-                        </td>
-                      ))}
-                    
-                     
-                      <td className="py-2 px-3 text-right whitespace-nowrap">
-                        <button
-                          onClick={() => handleEdit(row)}
-                          className="text-brand-500 hover:text-brand-600 text-xs font-medium mr-3"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(row.rowId)}
-                          className="text-error-500 hover:text-error-600 text-xs font-medium"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </ComponentCard>
+  <ComponentCard title={config.dashboardSectionLabel}>
+    {rows.length === 0 ? (
+      <p className="text-sm text-gray-500 dark:text-gray-400">No items added yet.</p>
+    ) : (
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-gray-200 dark:border-gray-800 text-left">
+              {config.fields.map((f) => (
+                <th key={f.key} className="py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                  {f.label}
+                </th>
+              ))}
+              <th className="py-2 px-3 font-medium text-gray-600 dark:text-gray-300">Status</th>
+              <th className="py-2 px-3 font-medium text-gray-600 dark:text-gray-300">Featured</th>
+              <th className="py-2 px-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.rowId} className="border-b border-gray-100 dark:border-gray-800">
+                {config.fields.map((f) => (
+                  <td key={f.key} className="py-2 px-3 text-gray-700 dark:text-gray-300">
+                    {f.type === "image" && row.fields[f.key] ? (
+                      <img
+                        src={FILE_BASE_URL + row.fields[f.key]}
+                        alt={f.label}
+                        className="w-10 h-10 object-cover rounded-md border border-gray-200 dark:border-gray-700"
+                      />
+                    ) : f.type === "select" ? (
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          row.fields[f.key] === "Veg"
+                            ? "bg-success-50 text-success-600"
+                            : row.fields[f.key] === "Non-Veg"
+                            ? "bg-error-50 text-error-600"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {row.fields[f.key]}
+                      </span>
+                    ) : (
+                      row.fields[f.key]
+                    )}
+                  </td>
+                ))}
+
+                <td className="py-2 px-3">
+                  <button
+                    onClick={() => handleToggleActive(row.rowId)}
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium transition ${
+                      row.active
+                        ? "bg-success-50 text-success-600 hover:bg-success-100"
+                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                    }`}
+                  >
+                    {row.active ? "Show" : "Hide"}
+                  </button>
+                </td>
+
+                <td className="py-2 px-3">
+                  <button
+                    onClick={() => handleToggleFeatured(row.rowId)}
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium transition ${
+                      row.featured
+                        ? "bg-amber-50 text-amber-600 hover:bg-amber-100"
+                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                    }`}
+                  >
+                    {row.featured ? "⭐ Featured" : "Not Featured"}
+                  </button>
+                </td>
+
+                <td className="py-2 px-3 text-right whitespace-nowrap">
+                  <button
+                    onClick={() => handleEdit(row)}
+                    className="text-brand-500 hover:text-brand-600 text-xs font-medium mr-3"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(row.rowId)}
+                    className="text-error-500 hover:text-error-600 text-xs font-medium"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+    )}
+  </ComponentCard>
+</div>
     </div>
   );
 }

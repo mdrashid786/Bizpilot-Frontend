@@ -19,6 +19,8 @@ export interface CategoryRowResponse {
   rowId: string;
   sortOrder: number;
   fields: Record<string, string>;
+  active: boolean;
+  featured: boolean;
 }
 
 export async function getCategoryConfig(): Promise<CategoryConfigResponse> {
@@ -40,12 +42,14 @@ export async function getCategoryRows(): Promise<CategoryRowResponse[]> {
 }
 
 export async function saveCategoryRow(
-  fields: Record<string, string>
+  fields: Record<string, string>,
+  active: boolean = true,
+  featured: boolean = false
 ): Promise<CategoryRowResponse> {
   const response = await apiFetch(`${API_BASE_URL}/business/category-data/row`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fields }),
+    body: JSON.stringify({ fields, active, featured }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to save row");
@@ -54,17 +58,20 @@ export async function saveCategoryRow(
 
 export async function updateCategoryRow(
   rowId: string,
-  fields: Record<string, string>
+  fields: Record<string, string>,
+  active: boolean = true,
+  featured: boolean = false
 ): Promise<CategoryRowResponse> {
   const response = await apiFetch(`${API_BASE_URL}/business/category-data/row/${rowId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fields }),
+    body: JSON.stringify({ fields, active, featured }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to update row");
   return data as CategoryRowResponse;
 }
+
 
 export async function deleteCategoryRow(rowId: string): Promise<void> {
   const response = await apiFetch(`${API_BASE_URL}/business/category-data/row/${rowId}`, {
@@ -75,6 +82,25 @@ export async function deleteCategoryRow(rowId: string): Promise<void> {
     throw new Error(data.message || "Failed to delete row");
   }
 }
+
+export async function toggleRowActive(rowId: string): Promise<CategoryRowResponse> {
+  const response = await apiFetch(`${API_BASE_URL}/business/category-data/row/${rowId}/toggle-active`, {
+    method: "PATCH",
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to toggle status");
+  return data as CategoryRowResponse;
+}
+
+export async function toggleRowFeatured(rowId: string): Promise<CategoryRowResponse> {
+  const response = await apiFetch(`${API_BASE_URL}/business/category-data/row/${rowId}/toggle-featured`, {
+    method: "PATCH",
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to toggle featured status");
+  return data as CategoryRowResponse;
+}
+
 
 export async function uploadCategoryItemImage(file: File): Promise<string> {
   const formData = new FormData();
