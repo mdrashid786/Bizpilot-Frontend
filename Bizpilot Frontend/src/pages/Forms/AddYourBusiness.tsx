@@ -95,9 +95,9 @@ export default function AddYourBusiness() {
 
   const businessOptions = [
     { value: "RESTAURANT", label: "Restaurant" },
-    { value: "SALON", label: "Salon" },
-    { value: "GYM", label: "Gym" },
-    { value: "CLINIC", label: "Clinic" },
+    // { value: "SALON", label: "Salon" },
+    // // { value: "GYM", label: "Gym" },
+    // // { value: "CLINIC", label: "Clinic" },
   ];
 
   const isEditMode = businessId !== null;
@@ -527,7 +527,7 @@ export default function AddYourBusiness() {
         </div>
 
         {/* LOGO & COVER IMAGE */}
-        <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-2 mt-6 sm:mt-8">
+        {/* <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-2 mt-6 sm:mt-8">
           <div>
             <Label>Logo (recommended 512 x 512 px, max 1MB)</Label>
             {logoPreview && (
@@ -573,7 +573,7 @@ export default function AddYourBusiness() {
                 dark:file:bg-gray-800 dark:file:text-gray-300"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* SUBMIT BUTTON */}
         <div className="flex justify-center sm:justify-start mt-6 sm:mt-8">
