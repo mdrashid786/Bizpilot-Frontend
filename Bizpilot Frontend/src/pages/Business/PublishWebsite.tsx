@@ -7,7 +7,12 @@ import { Link } from "react-router";
 
 import { API_BASE_URL } from "../../config/api";
 
-const FILE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+// const FILE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+
+const FILE_BASE_URL = API_BASE_URL
+  .replace("https://admin.", "https://")
+  .replace(/\/api\/?$/, "");
+  
 
 
 import { getMyBusiness, toggleBusinessPublish, BusinessResponse } from "../../services/businessService";
@@ -47,7 +52,9 @@ export default function PublishWebsite() {
     }
   };
 
-  const siteUrl = business ? `${FILE_BASE_URL}/${business.slug}` : "";
+  // const siteUrl = business ? `${FILE_BASE_URL}/${business.slug}` : "";
+  const siteUrl = business? FILE_BASE_URL.replace("https://", `https://${business.slug}.`): "";
+
 
   if (loading) {
     return (

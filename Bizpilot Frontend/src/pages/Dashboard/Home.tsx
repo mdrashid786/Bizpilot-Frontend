@@ -12,8 +12,18 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
 
-const FILE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
-console.log("FILE_BASE_URL : "+FILE_BASE_URL)
+  // for
+// const FILE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+// console.log("FILE_BASE_URL : "+FILE_BASE_URL)
+
+
+// for live
+const FILE_BASE_URL = API_BASE_URL
+  .replace("https://admin.", "https://")
+  .replace(/\/api\/?$/, "");
+
+const siteUrl = business? FILE_BASE_URL.replace("https://", `https://${business.slug}.`): "";
+
 
   useEffect(() => {
     async function load() {
@@ -153,7 +163,8 @@ console.log("FILE_BASE_URL : "+FILE_BASE_URL)
                   <>
                     <span className="text-gray-300 dark:text-gray-600">•</span>
                     
-                      <a href={`${FILE_BASE_URL}/${business.slug}`}
+                     {/* <a href={`${FILE_BASE_URL}/${business.slug}`} */}
+                      <a href={`${siteUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-brand-500 hover:text-brand-600"
