@@ -11,7 +11,11 @@ import {
 } from "../../services/businessService";
 import { API_BASE_URL } from "../../config/api";
 
-const SITE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+// const SITE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+
+const SITE_BASE_URL = API_BASE_URL
+  .replace("https://admin.", "https://")
+  .replace(/\/api\/?$/, "");
 
 // Har theme-key ke liye visual identity — gradient + icon + accent color
 const THEME_VISUALS: Record<string, { gradient: string; icon: string; accent: string }> = {
