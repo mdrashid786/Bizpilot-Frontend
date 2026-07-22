@@ -11,7 +11,7 @@ export interface BusinessRegistrationPayload {
   address?: string;
   description?: string;
   category: BusinessCategory;
-  googleMap?: string;
+  googleMap?: string;       // 👈 naya
   tagline?: string;
   businessHours?: string;
   instagramUrl?: string;
@@ -26,11 +26,12 @@ export interface BusinessUpdatePayload {
   address?: string;
   description?: string;
   googleMap?: string;
-  tagline?: string;
+   tagline?: string;
   businessHours?: string;
   instagramUrl?: string;
   facebookUrl?: string;
 }
+
 
 export interface BusinessResponse {
   id: number;
@@ -47,10 +48,10 @@ export interface BusinessResponse {
   category: BusinessCategory;
   theme: string;
   published: boolean;
-  tagline: string;
-  businessHours: string;
-  instagramUrl: string;
-  facebookUrl: string;
+  tagline?: string;
+  businessHours?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
 }
 
 export interface ThemeOption {
