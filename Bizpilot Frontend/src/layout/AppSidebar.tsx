@@ -320,22 +320,22 @@ const navItems: NavItem[] = [
             <>
               <img
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/tryBizly-dark.png"
                 alt="Logo"
-                width={150}
+                width={200}
                 height={40}
               />
               <img
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/tryBizly-white.png"
                 alt="Logo"
-                width={150}
+                width={200}
                 height={40}
               />
             </>
           ) : (
             <img
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/tryBizly-white.png"
               alt="Logo"
               width={32}
               height={32}

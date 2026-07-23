@@ -16,17 +16,17 @@ export default function AuthLayout({
           <div className="relative flex items-center justify-center z-1">
             {/* <!-- ===== Common Grid Shape Start ===== --> */}
             <GridShape />
-            <div className="flex flex-col items-center max-w-xs">
+            <div className="flex flex-col items-center max-w-sm px-4">
               <Link to="/" className="block mb-4">
                 <img
-                  width={231}
+                  width={271}
                   height={48}
-                  src="/images/logo/auth-logo.svg"
-                  alt="Logo"
+                  src="/images/logo/tryBizly-white.png"
+                  alt="tryBizly Logo"
                 />
               </Link>
-              <p className="text-center text-gray-400 dark:text-white/60">
-                Free and Open-Source Tailwind CSS Admin Dashboard Template
+              <p className="text-center text-gray-300 dark:text-white/70 text-base font-medium leading-relaxed">
+                Empowering Your Business Growth & Simplifying Enterprise Solutions
               </p>
             </div>
           </div>
