@@ -38,6 +38,14 @@ export default function CategoryData() {
   const FILE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
   const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1 MB
 
+  function resolveImageUrl(path: string): string {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path; // Cloudinary ka poora URL — jaisa hai waisa use karo
+  }
+  return FILE_BASE_URL + path; // purana relative path — prepend karo
+}
+
   const [uploadingImage, setUploadingImage] = useState<string | null>(null); // jis field key ki image upload ho rahi hai
 
   useEffect(() => {
@@ -98,33 +106,35 @@ const handleImageSelect = async (key: string, e: ChangeEvent<HTMLInputElement>) 
 };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    if (!config) return;
+  if (!config) return;
 
-    const missing = config.fields.some((f) => !formValues[f.key]?.trim());
-    if (missing) {
-      setError("Please fill all fields.");
-      return;
+  const missing = config.fields.some((f) => !formValues[f.key]?.trim());
+  if (missing) {
+    setError("Please fill all fields.");
+    return;
+  }
+
+  setSaving(true);
+  try {
+    if (editingRowId) {
+      const updated = await updateCategoryRow(editingRowId, formValues, formActive, formFeatured);
+      setRows((prev) => prev.map((r) => (r.rowId === editingRowId ? updated : r)));
+      alert("Item updated successfully!");   // 👈 add karo
+    } else {
+      const created = await saveCategoryRow(formValues, formActive, formFeatured);
+      setRows((prev) => [...prev, created]);
+      alert("Item added successfully!");   // 👈 add karo
     }
-
-    setSaving(true);
-    try {
-     if (editingRowId) {
-        const updated = await updateCategoryRow(editingRowId, formValues, formActive, formFeatured);
-        setRows((prev) => prev.map((r) => (r.rowId === editingRowId ? updated : r)));
-      } else {
-        const created = await saveCategoryRow(formValues, formActive, formFeatured);
-        setRows((prev) => [...prev, created]);
-      }
-      resetForm(config);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save");
-    } finally {
-      setSaving(false);
-    }
-  };
+    resetForm(config);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Failed to save");
+  } finally {
+    setSaving(false);
+  }
+};
 
   const handleToggleActive = async (rowId: string) => {
   try {
@@ -206,9 +216,9 @@ const handleToggleFeatured = async (rowId: string) => {
 
           {field.type === "image" ? (
             <div>
-              {formValues[field.key] && (
+            {formValues[field.key] && (
                 <img
-                  src={FILE_BASE_URL + formValues[field.key]}
+                  src={resolveImageUrl(formValues[field.key])}
                   alt={field.label}
                   className="w-20 h-20 object-cover rounded-lg mb-2 border border-gray-200 dark:border-gray-700"
                 />
@@ -326,8 +336,8 @@ const handleToggleFeatured = async (rowId: string) => {
                 {config.fields.map((f) => (
                   <td key={f.key} className="py-2 px-3 text-gray-700 dark:text-gray-300">
                     {f.type === "image" && row.fields[f.key] ? (
-                      <img
-                        src={FILE_BASE_URL + row.fields[f.key]}
+                       <img
+                        src={resolveImageUrl(row.fields[f.key])}
                         alt={f.label}
                         className="w-10 h-10 object-cover rounded-md border border-gray-200 dark:border-gray-700"
                       />

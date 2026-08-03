@@ -22,6 +22,14 @@ const FILE_BASE_URL = API_BASE_URL
   .replace("https://admin.", "https://")
   .replace(/\/api\/?$/, "");
 
+  function resolveImageUrl(path: string): string {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path; // Cloudinary ka poora URL — jaisa hai waisa use karo
+  }
+  return FILE_BASE_URL + path; // purana relative path — prepend karo
+}
+
 const siteUrl = business? FILE_BASE_URL.replace("https://", `https://${business.slug}.`): "";
 
 
@@ -243,7 +251,7 @@ const siteUrl = business? FILE_BASE_URL.replace("https://", `https://${business.
           <li key={item.rowId} className="py-3 flex items-center gap-3">
             {imagePath ? (
               <img
-                src={FILE_BASE_URL + imagePath}
+                src={resolveImageUrl(imagePath)}
                 alt=""
                 className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
               />
