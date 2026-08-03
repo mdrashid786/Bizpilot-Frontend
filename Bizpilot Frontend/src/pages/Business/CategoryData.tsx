@@ -36,7 +36,7 @@ export default function CategoryData() {
   const [formFeatured, setFormFeatured] = useState(false);
 
   const FILE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
-  const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1 MB
+  const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 1 MB
 
   function resolveImageUrl(path: string): string {
   if (!path) return "";
@@ -88,7 +88,7 @@ const handleImageSelect = async (key: string, e: ChangeEvent<HTMLInputElement>) 
   if (!file) return;
 
   if (file.size > MAX_IMAGE_SIZE) {
-    setError(`Image size must be less than 1MB.`);
+    setError(`Image size must be less than 2MB.`);
     e.target.value = "";
     return;
   }
