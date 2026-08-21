@@ -24,6 +24,8 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import ChooseTemplate from "./pages/Business/ChooseTemplate";
+import RecentOrders from "./pages/Business/RecentOrders";
+
 
 
 
@@ -53,6 +55,10 @@ export default function App() {
               } />
               <Route path="/manage-menu" element={
                 <ProtectedRoute><CategoryData /></ProtectedRoute>
+              } />
+
+              <Route path="/orders" element={
+                <ProtectedRoute><RecentOrders /></ProtectedRoute>
               } />
               <Route path="/choose-template" element={
                 <ProtectedRoute><ChooseTemplate /></ProtectedRoute>
